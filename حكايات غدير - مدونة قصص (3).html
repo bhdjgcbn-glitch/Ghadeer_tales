@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حكايات غدير | مدونة قصصية</title>
+    
+    <!-- استدعاء الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                        serif: ['Amiri', 'serif'],
+                    },
+                    colors: {
+                        darkBg: '#080b12',
+                        darkCard: '#111724',
+                        goldAccent: '#d4af37',
+                        goldAccentHover: '#b5952f',
+                        textMuted: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #080b12;
+            color: #f8fafc;
+        }
+
+        /* تنسيق شريط التمرير (Scrollbar) ليناسب الثيم المظلم */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080b12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+
+        /* تحسين مظهر محتوى القصة عند القراءة */
+        .story-content-reader {
+            white-space: pre-wrap; /* يحافظ على المسافات والأسطر الجديدة من مربع النص */
+            line-height: 2.2;
+            font-size: 1.25rem;
+            color: #cbd5e1;
+        }
+        
+        .loader {
+            border: 4px solid #111724;
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen selection:bg-goldAccent selection:text-darkBg">
+
+    <!-- القائمة العلوية -->
+    <header class="fixed w-full top-0 z-50 bg-darkBg/90 backdrop-blur-md border-b border-white/5 shadow-lg">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-20">
+                <!-- الشعار -->
+                <button onclick="showView('home')" class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2 hover:text-goldAccent transition-colors">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-goldAccent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    حكايات غدير
+                </button>
+                
+                <!-- زر كتابة قصة -->
+                <button onclick="showView('add-story')" class="bg-goldAccent text-darkBg hover:bg-goldAccentHover px-4 py-2 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 shadow-lg shadow-goldAccent/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    <span class="hidden sm:inline">قصة جديدة</span>
+                    <span class="sm:hidden">جديد</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- شاشة التحميل الأولية -->
+    <div id="loading-view" class="fixed inset-0 z-40 bg-darkBg flex flex-col items-center justify-center pt-20">
+        <div class="loader mb-4"></div>
+        <p class="text-goldAccent font-serif text-xl animate-pulse">يتم استحضار القصص...</p>
+    </div>
+
+    <!-- المحتوى الرئيسي (الصفحة الرئيسية) -->
+    <main id="home-view" class="hidden flex-grow pt-28 pb-20">
+        <section class="container mx-auto px-4 sm:px-6">
+            <!-- الترحيب -->
+            <div class="text-center max-w-2xl mx-auto mb-16 mt-8">
+                <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 font-serif">مرحباً بكِ في عالمكِ</h1>
+                <p class="text-textMuted text-lg">هنا حيث تولد الحكايات المظلمة وتُنسج الغوامض. شاركي قصصكِ ودعي الكلمات تتحدث.</p>
+            </div>
+
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold border-r-4 border-goldAccent pr-4">أحدث القصص</h2>
+            </div>
+            
+            <!-- شبكة القصص -->
+            <div id="stories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- سيتم حقن البطاقات هنا -->
+            </div>
+            
+            <!-- رسالة حالة عدم وجود قصص -->
+            <div id="no-stories-msg" class="hidden text-center py-20 bg-darkCard rounded-2xl border border-white/5">
+                <svg class="w-16 h-16 text-textMuted mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <h3 class="text-xl font-bold text-white mb-2 font-serif">لا توجد قصص حتى الآن</h3>
+                <p class="text-textMuted mb-6">كوني أول من ينسج حكاية في هذه المدونة.</p>
+                <button onclick="showView('add-story')" class="text-goldAccent hover:text-white underline transition-colors">اكتبي قصتك الأولى الآن</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- شاشة إضافة قصة جديدة -->
+    <main id="add-story-view" class="hidden flex-grow pt-28 pb-20">
+        <div class="container mx-auto px-4 sm:px-6 max-w-3xl">
+            <button onclick="showView('home')" class="text-textMuted hover:text-white mb-6 flex items-center gap-2 transition-colors group">
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                العودة
+            </button>
+            
+            <div class="bg-darkCard p-6 sm:p-8 rounded-2xl border border-white/10 shadow-2xl">
+                <h2 class="text-3xl font-bold text-white mb-8 font-serif border-b border-white/5 pb-4">صياغة حكاية جديدة</h2>
+                
+                <form id="story-form" onsubmit="handlePublishStory(event)" class="space-y-6">
+                    <div>
+                        <label for="story-title" class="block text-sm font-medium text-textMuted mb-2">عنوان القصة</label>
+                        <input type="text" id="story-title" required placeholder="مثال: ليلة في الغرفة المهجورة..." 
+                            class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-goldAccent focus:ring-1 focus:ring-goldAccent transition-colors font-serif text-lg">
+                    </div>
+                    
+                    <div>
+                        <label for="story-content" class="block text-sm font-medium text-textMuted mb-2">النص (محتوى القصة)</label>
+                        <textarea id="story-content" required rows="12" placeholder="كانت الليلة مظلمة والرياح تعصف بالخارج..." 
+                            class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-goldAccent focus:ring-1 focus:ring-goldAccent transition-colors font-serif text-lg resize-y"></textarea>
+                    </div>
+
+                    <div id="publish-error" class="hidden text-red-400 text-sm bg-red-400/10 p-3 rounded-lg"></div>
+                    
+                    <div class="pt-4 flex justify-end gap-4">
+                        <button type="button" onclick="showView('home')" class="px-6 py-3 rounded-lg font-bold text-textMuted hover:text-white transition-colors">إلغاء</button>
+                        <button type="submit" id="submit-btn" class="bg-goldAccent text-darkBg hover:bg-goldAccentHover px-8 py-3 rounded-lg font-bold transition-all shadow-lg shadow-goldAccent/20 flex items-center gap-2">
+                            <span>نشر القصة</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- شاشة قراءة القصة -->
+    <main id="read-story-view" class="hidden flex-grow pt-28 pb-20">
+        <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+            <button onclick="showView('home')" class="text-textMuted hover:text-white mb-8 flex items-center gap-2 transition-colors group">
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                العودة للقصص
+            </button>
+            
+            <article class="bg-darkCard p-6 sm:p-12 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden">
+                <!-- لمسة تجميلية -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-goldAccent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                
+                <header class="mb-10 text-center relative z-10">
+                    <h1 id="reader-title" class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 font-serif leading-tight"></h1>
+                    <div class="flex items-center justify-center gap-2 text-textMuted text-sm">
+                        <svg class="w-4 h-4 text-goldAccent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span id="reader-date"></span>
+                    </div>
+                </header>
+
+                <hr class="border-white/5 w-24 mx-auto mb-10">
+
+                <div id="reader-content" class="story-content-reader font-serif text-right relative z-10">
+                    <!-- سيتم حقن النص هنا -->
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-darkBg border-t border-white/5 py-8 mt-auto text-center text-textMuted z-10">
+        <div class="container mx-auto px-4">
+            <p>© 2026 حكايات غدير. صُنع بحب للقصص المظلمة والغامضة.</p>
+        </div>
+    </footer>
+
+    <!-- سكربت إدارة القصص (باستخدام التخزين المحلي LocalStorage بدلاً من قواعد البيانات) -->
+    <script>
+        // القصص الافتراضية الأولية
+        const initialStories = [
+            {
+                id: 'story-1',
+                title: 'لحن من زجاج',
+                content: 'في زاوية معتمة من مقهى قديم، كان هناك بيانو يعزف من تلقاء نفسه كلما هطل المطر. لم يكن يعزف ألحاناً عشوائية، بل كان يعيد عزف الذكريات التي حاول رواد المقهى نسيانها. جلستُ هناك ذات ليلة، أرتشف قهوتي السوداء، حين بدأت أصابع خفية تعزف لحناً مألوفاً... لحناً كتبته أنا قبل سنوات طويلة ومزقته. كيف وصل إلى هنا؟ ومن الذي يعزفه الآن؟',
+                createdAt: Date.now() - 3600000 // قبل ساعة
+            },
+            {
+                id: 'story-2',
+                title: 'بائع الوقت',
+                content: 'يقال إن هناك رجلاً يتجول في شوارع المدينة بعد منتصف الليل، لا يبيع سلعاً عادية، بل يبيع "الدقائق". يمكنك شراء خمس دقائق إضافية لتعيشها مع شخص فقدته، أو دقيقة واحدة لتتراجع عن قرار ندمت عليه. المشكلة الوحيدة؟ الثمن ليس مالاً، بل تدفع من ذكرياتك السعيدة. سألني ذات ليلة: "كم دقيقة تحتاج؟"، فنظرت إلى ساعتي المتوقفة وأدركت أنني لا أملك ذكريات تكفي لشراء ثانية واحدة.',
+                createdAt: Date.now() - 86400000 // قبل يوم
+            },
+            {
+                id: 'story-3',
+                title: 'المرايا الصامتة',
+                content: 'اشتريت مرآة عتيقة بإطار مذهب من بائع متجول. في اليوم الأول، بدا كل شيء طبيعياً. في اليوم الثاني، لاحظت أن انعكاسي يتأخر بجزء من الثانية عن حركتي. وفي اليوم الثالث... توقف انعكاسي عن تقليدي تماماً. وقف يحدق بي بنظرة باردة، ثم رفع إصبعه ووضعه على شفتيه هامساً: "اششش... دوري الآن لأسكن في الخارج".',
+                createdAt: Date.now() - 172800000 // قبل يومين
+            }
+        ];
+
+        // جلب القصص الخاصة بك من متصفحك (إن وجدت)
+        let customStories = JSON.parse(localStorage.getItem('ghadeer_stories') || '[]');
+        
+        // دمج قصصك مع القصص الافتراضية وترتيبها من الأحدث للأقدم
+        let allStories = [...customStories, ...initialStories].sort((a, b) => b.createdAt - a.createdAt);
+
+        // متغيرات الواجهة
+        const views = {
+            loading: document.getElementById('loading-view'),
+            home: document.getElementById('home-view'),
+            addStory: document.getElementById('add-story-view'),
+            readStory: document.getElementById('read-story-view')
+        };
+        const storiesGrid = document.getElementById('stories-grid');
+        const noStoriesMsg = document.getElementById('no-stories-msg');
+
+        // إدارة التنقل بين الصفحات (Views)
+        window.showView = (viewName) => {
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // تنسيق التاريخ للغة العربية
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return new Intl.DateTimeFormat('ar-SA', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            }).format(date);
+        }
+
+        // إنشاء بطاقة القصة
+        function createStoryCard(story) {
+            const article = document.createElement('article');
+            article.className = "bg-darkCard rounded-2xl p-6 border border-white/5 hover:border-goldAccent/40 transition-all duration-300 group hover:-translate-y-1 hover:shadow-xl hover:shadow-black/50 cursor-pointer flex flex-col h-full";
+            
+            // أخذ مقتطف من القصة للبطاقة (أول 120 حرف)
+            let excerpt = story.content.length > 120 ? story.content.substring(0, 120) + '...' : story.content;
+
+            article.innerHTML = `
+                <div class="flex-grow">
+                    <h3 class="text-xl font-bold text-white mb-3 font-serif group-hover:text-goldAccent transition-colors line-clamp-2">${story.title}</h3>
+                    <p class="text-textMuted text-sm mb-4 leading-relaxed font-serif line-clamp-3">${excerpt}</p>
+                </div>
+                <div class="flex items-center justify-between text-xs font-medium border-t border-white/5 pt-4 mt-4 text-textMuted">
+                    <span>${formatDate(story.createdAt)}</span>
+                    <span class="text-white group-hover:text-goldAccent flex items-center gap-1 transition-colors">اقرأ القصة &larr;</span>
+                </div>
+            `;
+            
+            article.onclick = () => openStory(story);
+            return article;
+        }
+
+        // فتح وعرض القصة المحددة
+        function openStory(story) {
+            document.getElementById('reader-title').innerText = story.title;
+            document.getElementById('reader-date').innerText = formatDate(story.createdAt);
+            document.getElementById('reader-content').textContent = story.content; // textContent يحافظ على الـ pre-wrap
+            
+            showView('readStory');
+        }
+
+        // رسم القصص على الشاشة
+        function renderStories() {
+            storiesGrid.innerHTML = '';
+            if (allStories.length === 0) {
+                storiesGrid.classList.add('hidden');
+                noStoriesMsg.classList.remove('hidden');
+            } else {
+                storiesGrid.classList.remove('hidden');
+                noStoriesMsg.classList.add('hidden');
+                
+                allStories.forEach(story => {
+                    storiesGrid.appendChild(createStoryCard(story));
+                });
+            }
+        }
+
+        // إضافة قصة جديدة وحفظها في المتصفح
+        window.handlePublishStory = (e) => {
+            e.preventDefault();
+
+            const titleInput = document.getElementById('story-title');
+            const contentInput = document.getElementById('story-content');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+
+            if (!title || !content) return;
+
+            // إنشاء القصة الجديدة
+            const newStory = {
+                id: 'story-' + Date.now(),
+                title: title,
+                content: content,
+                createdAt: Date.now()
+            };
+
+            // حفظ القصة في قائمة قصصك الخاصة
+            customStories.push(newStory);
+            
+            // حفظ القائمة في التخزين المحلي للمتصفح
+            localStorage.setItem('ghadeer_stories', JSON.stringify(customStories));
+
+            // تحديث قائمة كل القصص (المحفوظة + الافتراضية)
+            allStories = [...customStories, ...initialStories].sort((a, b) => b.createdAt - a.createdAt);
+            
+            // إعادة رسم القصص في الصفحة
+            renderStories();
+
+            // تفريغ الحقول والعودة للرئيسية
+            titleInput.value = '';
+            contentInput.value = '';
+            showView('home');
+        };
+
+        // بدء التشغيل عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            // محاكاة شاشة تحميل سريعة لإضافة جو جمالي
+            setTimeout(() => {
+                renderStories();
+                showView('home');
+            }, 800);
+        });
+
+    </script>
+</body>
+</html>
